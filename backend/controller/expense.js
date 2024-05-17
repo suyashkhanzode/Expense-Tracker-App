@@ -5,7 +5,7 @@ exports.addExpense = (req,res,next) =>{
     const amount = req.body.amount;
     const description = req.body.description;
     const category = req.body.category
-    const userId = req.params.userId;
+    const userId = req.userId.userId;
     User.findByPk(userId)
     .then((user) =>{
         Expense.create({
@@ -25,7 +25,8 @@ exports.addExpense = (req,res,next) =>{
 };
 
 exports.getExpense = (req,res,next) =>{
-    const userId = req.params.userId;
+    debugger
+    const userId = req.userId.userId;
     Expense.findAll({
         where :{
             userId : userId

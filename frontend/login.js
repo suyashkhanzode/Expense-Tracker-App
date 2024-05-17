@@ -12,8 +12,9 @@ function handleLogin(event) {
     .then((res)=>{
        if(res.data.message === "User authenticated successfully.")
        {
-         const userId = res.data.user.id
-         window.sessionStorage.setItem("userId",userId);
+        debugger
+         const token = res.data.token;
+         window.sessionStorage.setItem("token",token);
          window.location.href = '/expenseDashboard.html'
        } 
         

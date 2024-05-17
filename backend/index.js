@@ -23,7 +23,7 @@ const db = require("./utils/database")
 const user = require("./models/user");
 const expense = require("./models/expense")
 
-user.hasOne(expense,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
+user.hasMany(expense,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 expense.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 
 db.sync()

@@ -1,3 +1,4 @@
+document.getElementById('signUpForm').addEventListener('submit',handleSignUp)
 function handleSignUp(event) {
     event.preventDefault();
     const name = document.getElementById('name').value;
@@ -9,7 +10,7 @@ function handleSignUp(event) {
         password : password
     })
     .then((res)=>{
-       
+       window.location.href = "/login.html"
     })
     .catch((err)=>{
         

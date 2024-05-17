@@ -3,10 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 const expenseController = require('../controller/expense');
+const auth = require('../middleware/auth')
 
-router.get('/:userId/get-expense',expenseController.getExpense);
-router.post('/:userId/add-expense',expenseController.addExpense);
-router.delete('/:userId/delete-expense/:id',expenseController.deleteExpense);
-router.put('/:userId/update-expense/:id',expenseController.updateExpense)
+router.get('/get-expense',auth.authenticate,expenseController.getExpense);
+router.post('/add-expense',auth.authenticate,expenseController.addExpense);
+router.delete('/delete-expense/:id',expenseController.deleteExpense);
+router.put('/update-expense/:id',expenseController.updateExpense)
 
 module.exports = router;

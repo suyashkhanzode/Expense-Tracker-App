@@ -1,5 +1,11 @@
 const User = require("../models/user");
 const bycript = require("bcrypt");
+const jwt = require('jsonwebtoken');
+
+const secertKey = "ddfygduyfgsdygfdyu56434684%^^&&*)ggd";
+function generateAccessToken(id) {
+    return jwt.sign({userId :id},secertKey)
+}
 
 exports.signUpUser = (req, res, next) => {
   const name = req.body.name;
@@ -13,7 +19,7 @@ exports.signUpUser = (req, res, next) => {
       password: hash
     })
       .then((result) => {
-        res.status(201).json({ message: result });
+        res.status(201).json({status : true});
       })
       .catch((err) => {
         if (
@@ -52,7 +58,8 @@ exports.loginUser = async (req, res, next) => {
             {
                 res.status(200).json({
                     message: "User authenticated successfully.",
-                    user: user
+                    token : generateAccessToken(user.id)
+                   
                 });
                 
             }else{
