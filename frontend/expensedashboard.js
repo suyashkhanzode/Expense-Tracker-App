@@ -124,4 +124,8 @@ function createList(expens) {
   document.querySelector(".list-group").appendChild(list);
 }
 
+document.getElementById('payBtn').addEventListener('click',()=>{
+    
+})
+
 window.onload = handleOnLoad();
