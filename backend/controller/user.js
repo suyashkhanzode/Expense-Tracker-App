@@ -1,10 +1,10 @@
 const User = require("../models/user");
 const bycript = require("bcrypt");
 const jwt = require('jsonwebtoken');
-
-const secertKey = "ddfygduyfgsdygfdyu56434684%^^&&*)ggd";
-function generateAccessToken(id) {
-    return jwt.sign({userId :id},secertKey)
+require('dotenv').config();
+const secertKey = process.env.TOKEN_SECRET_KEY;
+function generateAccessToken(user) {
+    return jwt.sign({user :user},secertKey)
 }
 
 exports.signUpUser = (req, res, next) => {
@@ -58,8 +58,8 @@ exports.loginUser = async (req, res, next) => {
             {
                 res.status(200).json({
                     message: "User authenticated successfully.",
-                    token : generateAccessToken(user.id)
-                   
+                    token : generateAccessToken(user),
+                    isPremiumUSer : user.isPremium
                 });
                 
             }else{

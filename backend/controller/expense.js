@@ -5,7 +5,7 @@ exports.addExpense = (req,res,next) =>{
     const amount = req.body.amount;
     const description = req.body.description;
     const category = req.body.category
-    const userId = req.userId.userId;
+    const userId = req.user.id;
     User.findByPk(userId)
     .then((user) =>{
         Expense.create({
@@ -25,8 +25,9 @@ exports.addExpense = (req,res,next) =>{
 };
 
 exports.getExpense = (req,res,next) =>{
+    
+    const userId = req.user.id;
     debugger
-    const userId = req.userId.userId;
     Expense.findAll({
         where :{
             userId : userId
@@ -77,5 +78,25 @@ exports.updateExpense = (req,res,next) =>{
         res.json({message : err})
     })
 }
+
+exports.getAllExpensesWithUsers = (req, res, next) => {
+    Expense.findAll({
+        include: [{
+            model: User,
+            attributes: ['id', 'name', 'email'] // Adjust the attributes as needed
+        }]
+    })
+    .then(expenses => {
+        res.status(200).json(expenses);
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'An error occurred while fetching expenses',
+            error: err
+        });
+    });
+};
+
+
 
 

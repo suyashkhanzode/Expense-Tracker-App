@@ -28,7 +28,9 @@ function handleFormSubmit(event) {
     });
 }
 function handleOnLoad() {
-    debugger
+  
+    
+   
   axios
     .get(`http://localhost:3000/expenses/get-expense`, 
       {headers : 
@@ -121,11 +123,83 @@ function createList(expens) {
   list.append(deleteBtn);
 
   list.append(editBtn);
-  document.querySelector(".list-group").appendChild(list);
+  document.querySelectorAll(".list-group")[0].appendChild(list);
+  isPremiumMember()
 }
 
-document.getElementById('payBtn').addEventListener('click',()=>{
+document.getElementById('payBtn').addEventListener('click', () => {
+  debugger;
+  axios.get(`http://localhost:3000/order/buy-primium`, {
+      headers: { Authorization: token }
+  })
+  .then((response) => {
     
-})
+      const data = response.data;
+      const options = {
+          key: data.key_id, // Razorpay key ID
+          amount: data.order.amount, // Amount in paisa
+          currency: 'INR',
+          name: 'Your Company Name',
+          description: 'Premium Subscription',
+          order_id: data.order.id, // Order ID from Razorpay
+          handler: function (response) {
+              alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+              alert(`Order ID: ${response.razorpay_order_id}`);
+              alert(`Signature: ${response.razorpay_signature}`);
+
+              // Verify the payment on the backend
+              axios.post('http://localhost:3000/order/verify-payment', {
+                   order_id : options.order_id,
+                   payment_id : response.razorpay_payment_id
+              }, 
+              {
+                  headers: { Authorization: token }
+              })
+              .then(res => {
+                  alert('Payment verified and order updated successfully!');
+              })
+              .catch(err => {
+                  console.error('Error verifying payment:', err);
+              });
+          },
+          theme: {
+            color: '#F37254'
+        },
+         modal: {
+            ondismiss: function() {
+                console.log('Checkout form closed');
+            }
+          }
+        }
+
+      const rzp1 = new Razorpay(options);
+      rzp1.open();
+  })
+  .catch((err) => {
+      console.error('Error creating order:', err);
+  });
+});
+
+function isPremiumMember() {
+  const isPremiumUSer = window.sessionStorage.getItem('isPremiumUSer');
+  if(isPremiumUSer === 'true')
+  {
+    const ele = document.getElementById("payBtnDiv");
+     ele.innerHTML = "";
+     ele.innerHTML = "<h3>You Are Primium User</h3>"
+     const btn = document.createElement('button')
+     btn.className = "btn btn-info";
+     btn.textContent = "Show LeadBoard"
+     btn.addEventListener('click', ()=>{
+         getLedboard()
+     })
+     ele.appendChild(btn)
+  }
+}
+
+function getLedboard() {
+    
+}
+
 
 window.onload = handleOnLoad();

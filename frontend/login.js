@@ -1,7 +1,7 @@
 document.getElementById('loginform').addEventListener('submit',handleLogin)
 
 function handleLogin(event) {
-    debugger;
+    
     event.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -10,11 +10,14 @@ function handleLogin(event) {
         password : password
     })
     .then((res)=>{
+        debugger;
        if(res.data.message === "User authenticated successfully.")
        {
-        debugger
+       
          const token = res.data.token;
+         const isPremiumUSer = res.data.isPremiumUSer;
          window.sessionStorage.setItem("token",token);
+         window.sessionStorage.setItem("isPremiumUSer",isPremiumUSer)
          window.location.href = '/expenseDashboard.html'
        } 
         

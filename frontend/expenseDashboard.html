@@ -9,9 +9,9 @@
   </head>
   <body style="margin: 0">
     
-    <divs style="position : absolute ;right: 10px;top: 10px;">
+    <div id="payBtnDiv" style="position : absolute ;right: 10px;top: 10px;">
         <button id="payBtn" class="btn btn-primary">Buy Primium</button>
-    </divs>
+    </div>
     
     
     <form onsubmit="handleFormSubmit(event)">
@@ -52,17 +52,23 @@
         </div>
         
       </div>
-
-      <button id="submitButton" type="submit" class="btn btn-primary">Submit</button>
+    <span></span>
+      <button id="submitButton" type="submit" class="btn btn-primary">Add Expense</button>
     </form>
    
        
-
+   <h2>Expenses </h2>
     <ul class="list-group">
      
     </ul>
+    <h2>LeadBoard </h2>
+    <ul class="list-group">
+     
+    </ul>
+
    
   </body>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="expensedashboard.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
