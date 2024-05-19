@@ -78,3 +78,20 @@ exports.loginUser = async (req, res, next) => {
     }
 };
 
+exports.getTotalAmount =(req,res,next) =>{
+    User.findAll({
+      attributes : ['name','totalAmount'],
+      group : ['id'],
+      order : [['totalAmount','DESC']]
+    })
+    .then((result)=>{
+       res.status(200).json(result)
+    })
+    .catch((err)=>{
+      res.status(500).json({
+        message: "An error occurred while fetching expenses",
+        error: err,
+      });
+    })
+}
+

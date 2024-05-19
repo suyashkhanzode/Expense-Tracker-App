@@ -200,8 +200,9 @@ function isPremiumMember() {
 }
 
 function getLedboard() {
-  axios.get(`http://localhost:3000/expenses/grouped-expenses`)
+  axios.get(`http://localhost:3000/user/get-total-amount`)
     .then((response) =>{
+        debugger;
           response.data.forEach((data) =>{
             showLeadboard(data)
           })
@@ -218,7 +219,7 @@ function showLeadboard(data) {
   list.className = "list-group-item d-flex justify-content-between align-items-center p-2";
 
   const nameDiv = document.createElement('div');
-  nameDiv.innerHTML = `<strong>Name:</strong> ${data.user.name}`;
+  nameDiv.innerHTML = `<strong>Name:</strong> ${data.name}`;
   nameDiv.className = "mr-3"; // Reduced margin-right to make it compact
   
   const amountDiv = document.createElement('div');

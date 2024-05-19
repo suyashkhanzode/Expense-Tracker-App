@@ -8,4 +8,6 @@ router.post('/sign-up',userController.signUpUser)
 
 router.post('/login',userController.loginUser)
 
+router.get('/get-total-amount',userController.getTotalAmount)
+
 module.exports = router
