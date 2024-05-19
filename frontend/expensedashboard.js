@@ -1,3 +1,5 @@
+
+
 const token = window.sessionStorage.getItem("token");
 function handleFormSubmit(event) {
   event.preventDefault();
@@ -108,10 +110,10 @@ function createList(expens) {
   list.className = "list-group-item";
   const deleteBtn = document.createElement("button");
   deleteBtn.className = "btn btn-danger";
-  deleteBtn.textContent = "Delete";
+  deleteBtn.innerHTML= `<span>Delete</span>`;
   const editBtn = document.createElement("button");
   editBtn.className = "btn btn-warning";
-  editBtn.textContent = "Edit";
+  editBtn.innerHTML = `<span>Edit</span>`;
   list.textContent =
     expens.amount + "  " + expens.description + " " + expens.category + " ";
   deleteBtn.addEventListener("click", function () {
@@ -198,7 +200,35 @@ function isPremiumMember() {
 }
 
 function getLedboard() {
-    
+  axios.get(`http://localhost:3000/expenses/grouped-expenses`)
+    .then((response) =>{
+          response.data.forEach((data) =>{
+            showLeadboard(data)
+          })
+           
+       })
+    .catch((err) =>{
+
+    })
+
+}
+
+function showLeadboard(data) {
+  const list = document.createElement("li");
+  list.className = "list-group-item d-flex justify-content-between align-items-center p-2";
+
+  const nameDiv = document.createElement('div');
+  nameDiv.innerHTML = `<strong>Name:</strong> ${data.user.name}`;
+  nameDiv.className = "mr-3"; // Reduced margin-right to make it compact
+  
+  const amountDiv = document.createElement('div');
+  amountDiv.innerHTML = `<strong>Total Amount:</strong> ${data.totalAmount}`;
+  amountDiv.className = "mr-3";
+
+  list.appendChild(nameDiv);
+  list.appendChild(amountDiv);
+
+  document.querySelectorAll(".list-group")[1].appendChild(list);
 }
 
 

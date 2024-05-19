@@ -1,5 +1,6 @@
 const Expense = require('../models/expense');
 const User = require('../models/user')
+const Sequelize = require('../utils/database')
 
 exports.addExpense = (req,res,next) =>{
     const amount = req.body.amount;
@@ -97,6 +98,30 @@ exports.getAllExpensesWithUsers = (req, res, next) => {
     });
 };
 
+
+exports.getExpensesGroupedByUser = (req, res, next) => {
+    Expense.findAll({
+        attributes: [
+            
+            [Sequelize.fn('SUM', Sequelize.col('amount')), 'totalAmount']
+        ],
+        include: [{
+            model: User,
+            attributes: ['name']
+        }],
+        group: ['userId', 'user.id'],
+        order: [[Sequelize.literal('totalAmount'), 'DESC']]
+    })
+    .then(expenses => {
+        res.status(200).json(expenses);
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'An error occurred while fetching expenses',
+            error: err
+        });
+    });
+};
 
 
 
