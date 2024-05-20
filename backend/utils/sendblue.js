@@ -7,14 +7,14 @@ apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
 
 const tranEmailApi = new Sib.TransactionalEmailsApi();
 
-exports.sendEmail = async (to, subject, textContent) => {
+exports.sendEmail = async (to, subject, textContent,htmlContent) => {
     const sendSmtpMail = new Sib.SendSmtpEmail();
 
     sendSmtpMail.sender = { email: process.env.SENDER_EMAIL, name: 'Expense Tracker' };
     sendSmtpMail.to = [{ email: to }];
     sendSmtpMail.subject = subject;
     sendSmtpMail.textContent = textContent;
-    sendSmtpMail.htmlContent = `<p>${textContent}</p>`; // Optional: If you want to include HTML content
+    sendSmtpMail.htmlContent = htmlContent; 
 
     try {
         const data = await tranEmailApi.sendTransacEmail(sendSmtpMail);

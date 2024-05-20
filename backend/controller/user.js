@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const secertKey = process.env.TOKEN_SECRET_KEY;
 
-const smtp = require('../utils/sendblue')
+
 
 function generateAccessToken(user) {
     return jwt.sign({user :user},secertKey)
@@ -98,18 +98,7 @@ exports.getTotalAmount =(req,res,next) =>{
     })
 }
 
-exports.forgotPassword = (req,res,next) =>{
-    const recieverMail = req.body.recieverMail;
-    debugger;
-    smtp.sendEmail(recieverMail,"Reset Password","Your Reset Password Link")
-    .then((result) =>{
-      res.status(200).json({message : "Please Chech Your Inbox"})
-    })
-    .catch((err) =>[
-      res.status(500).json({
-        message: "An error occurred while Sendin MAil",
-        error: err,
-      })
-    ])
-}
+
+
+
 

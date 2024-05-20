@@ -16,21 +16,27 @@ app.use((request, response, next)=>{
 const userRoute = require('./routes/user')
 const expenseRoute = require('./routes/expense')
 const orderRoute = require('./routes/order')
+const passwordRoute = require('./routes/password')
 
 app.use('/user',userRoute)
 app.use('/expenses',expenseRoute)
 app.use('/order',orderRoute)
+app.use('/password',passwordRoute)
 
 const db = require("./utils/database")
 const user = require("./models/user");
 const expense = require("./models/expense")
 const order = require('./models/order')
+const forgotpasswordrequest = require('./models/forgotPasswordRequest')
 
 user.hasMany(expense,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 expense.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 
 user.hasMany(order,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 order.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
+
+user.hasMany(forgotpasswordrequest,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
+forgotpasswordrequest.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 
 db.sync()
   .then((res) => {

@@ -31,6 +31,7 @@ function handleFormSubmit(event) {
     });
 }
 function handleOnLoad() {
+  console.log(token)
   axios
     .get(`http://localhost:3000/expenses/get-expense`, {
       headers: {
