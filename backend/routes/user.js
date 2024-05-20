@@ -10,4 +10,6 @@ router.post('/login',userController.loginUser)
 
 router.get('/get-total-amount',userController.getTotalAmount)
 
+router.post('/forgot-password',userController.forgotPassword);
+
 module.exports = router
