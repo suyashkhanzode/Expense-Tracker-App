@@ -1,116 +1,116 @@
 const Expense = require("../models/expense");
 const User = require("../models/user");
-const Sequelize = require("../utils/database");
+const sequelize = require("../utils/database");
 
-exports.addExpense = (req, res, next) => {
-  const amount = req.body.amount;
-  const description = req.body.description;
-  const category = req.body.category;
+exports.addExpense = async (req, res, next) => {
+  const { amount, description, category } = req.body;
   const userId = req.user.id;
-  User.findByPk(userId).then((user) => {
-    const currentTotalAmount = parseInt(user.totalAmount);
-    const updateTotalAmount = currentTotalAmount +  parseInt(amount);
 
-    User
-      .update(
-        {
-          totalAmount: updateTotalAmount,
-        },
-        {
-          where: {
-            id: userId,
-          },
-        }
-      )
-      .then(() => {
-        Expense.create({
-          description: description,
-          amount: amount,
-          category: category,
-          userId: userId,
-        })
-          .then((result) => {
-            res.status(201).json({ message: result });
-          })
-          .catch((err) => {
-            res.json({ message: err });
-          });
-      })
-      .catch((err) => {
-        res.json({ message: err });
-      });
-  });
+  const t = await sequelize.transaction();
+
+  try {
+    const user = await User.findByPk(userId, { transaction: t });
+    if (!user) {
+      await t.rollback();
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newExpense = await Expense.create(
+      { description, amount, category, userId },
+      { transaction: t }
+    );
+
+    const currentTotalAmount = parseInt(user.totalAmount) || 0;
+    const updatedTotalAmount = currentTotalAmount + parseInt(amount);
+
+    await User.update(
+      { totalAmount: updatedTotalAmount },
+      { where: { id: userId }, transaction: t }
+    );
+
+    await t.commit();
+    res.status(201).json({ message: "Expense added successfully", expense: newExpense });
+  } catch (err) {
+    await t.rollback();
+    res.status(500).json({ message: "An error occurred", error: err });
+  }
 };
 
 exports.getExpense = (req, res, next) => {
   const userId = req.user.id;
-  debugger;
-  Expense.findAll({
-    where: {
-      userId: userId,
-    },
-  })
-    .then((result) => {
-      res.status(201).json(result);
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
+
+  Expense.findAll({ where: { userId } })
+    .then((expenses) => res.status(200).json(expenses))
+    .catch((err) => res.status(500).json({ message: "An error occurred", error: err }));
 };
 
-exports.deleteExpense = (req, res, next) => {
-  const id = req.params.id;
-  Expense.destroy({
-    where: {
-      id: id,
-    },
-  })
-    .then((result) => {
-      res.status(201).json({ message: result });
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
-};
+exports.deleteExpense = async (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
 
-exports.updateExpense = (req, res, next) => {
-  const title = req.body.title;
-  const amount = req.body.amount;
-  const id = req.params.id;
-  Expense.update(
-    { title: title, amount: amount },
-    {
-      where: {
-        id: id,
-      },
+  const t = await sequelize.transaction();
+
+  try {
+    const expense = await Expense.findOne({ where: { id }, transaction: t });
+    if (!expense) {
+      await t.rollback();
+      return res.status(404).json({ message: "Expense not found" });
     }
-  )
-    .then((result) => {
-      res.status(201).json({ message: result });
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
+
+    const currentTotalAmount = parseInt(req.user.totalAmount) || 0;
+    const updatedTotalAmount = currentTotalAmount - parseInt(expense.amount);
+
+    await User.update(
+      { totalAmount: updatedTotalAmount },
+      { where: { id: userId }, transaction: t }
+    );
+
+    await Expense.destroy({ where: { id }, transaction: t });
+
+    await t.commit();
+    res.status(200).json({ message: "Expense deleted successfully" });
+  } catch (err) {
+    await t.rollback();
+    res.status(500).json({ message: "An error occurred", error: err });
+  }
 };
 
-exports.getAllExpensesWithUsers = (req, res, next) => {
-  Expense.findAll({
-    include: [
-      {
-        model: User,
-        attributes: ["id", "name", "email"], // Adjust the attributes as needed
-      },
-    ],
-  })
-    .then((expenses) => {
-      res.status(200).json(expenses);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: "An error occurred while fetching expenses",
-        error: err,
-      });
-    });
+exports.updateExpense = async (req, res, next) => {
+  const { description, amount, category } = req.body;
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  const t = await sequelize.transaction();
+
+  try {
+    const user = await User.findByPk(userId, { transaction: t });
+    if (!user) {
+      await t.rollback();
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const oldExpense = await Expense.findOne({ where: { id }, transaction: t });
+    if (!oldExpense) {
+      await t.rollback();
+      return res.status(404).json({ message: "Expense not found" });
+    }
+
+    const updatedExpense = await Expense.update(
+      { description, amount, category },
+      { where: { id }, transaction: t }
+    );
+
+    const currentTotalAmount = parseInt(user.totalAmount) || 0;
+    const updatedTotalAmount = currentTotalAmount - parseInt(oldExpense.amount) + parseInt(amount);
+
+    await user.update({ totalAmount: updatedTotalAmount }, { where: { id: userId }, transaction: t });
+
+    await t.commit();
+    res.status(200).json({ message: "Expense updated successfully", expense: updatedExpense });
+  } catch (err) {
+    await t.rollback();
+    res.status(500).json({ message: "An error occurred", error: err });
+  }
 };
 
 
