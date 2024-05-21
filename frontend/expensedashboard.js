@@ -208,7 +208,14 @@ function isPremiumMember() {
     btn.addEventListener("click", () => {
       getLedboard();
     });
+    const reportBtn = document.createElement('button');
+    reportBtn.className = "btn btn-dark";
+    reportBtn.textContent = "Generate Report";
+    reportBtn.addEventListener("click", ()=>{
+           window.location.href = "reportgeneration.html";
+    })
     ele.appendChild(btn);
+    ele.appendChild(reportBtn)
   }
 }
 
@@ -242,5 +249,7 @@ function showLeadboard(data) {
 
   document.querySelectorAll(".list-group")[1].appendChild(list);
 }
+
+
 
 window.onload = handleOnLoad();
