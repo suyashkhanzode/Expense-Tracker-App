@@ -1,6 +1,8 @@
 const Expense = require("../models/expense");
 const User = require("../models/user");
 const sequelize = require("../utils/database");
+const AWS = require('aws-sdk')
+require('dotenv').config()
 
 exports.addExpense = async (req, res, next) => {
   const { amount, description, category } = req.body;
@@ -112,5 +114,65 @@ exports.updateExpense = async (req, res, next) => {
     res.status(500).json({ message: "An error occurred", error: err });
   }
 };
+
+// function uploadFile(fileName,data) {
+//     const s3 = new AWS.S3({
+//       accessKeyId: process.env.AWS_ACCESS_KEY,
+//       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//       region: process.env.AWS_REGION
+//     })
+
+//     s3.createBucket(()=>{
+//        var params = {
+//          Bucket : process.env.AWS_BUCKET_NAME,
+//          Key : fileName,
+//          Body : data
+//        };
+//        s3.upload(params,(err,s3Response) =>{
+//              if(err){
+//                 console.log(err);
+//              }else{
+//               console.log(s3Response)
+//              }
+//             })
+
+//     })
+// }
+function uploadFile(fileName, data) {
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+  });
+
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileName,
+    Body: data,
+  };
+
+  return new Promise((resolve, reject) => {
+    s3.upload(params, (err, s3Response) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
+        resolve(s3Response.Location);
+      }
+    });
+  });
+}
+
+
+exports.downloadFile = async (req,res,next) =>{
+  //const userId = req.user.id;
+
+    const allExpense = await req.user.getExpenses();
+    const data = JSON.stringify(allExpense);
+    const fileName = 'expense.txt';
+    const fileURL = await uploadFile(data,fileName);
+    console.log(fileURL);
+
+}
 
 
