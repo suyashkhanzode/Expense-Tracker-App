@@ -56,12 +56,15 @@
       <button id="submitButton" type="submit" class="btn btn-primary">Add Expense</button>
     </form>
    
-    <h2>Expenses</h2>
-    <div id="expenseList" class="list-group"></div>
-
-    <nav id="pagination" aria-label="Page navigation example">
-      <ul class="pagination justify-content-center"></ul>
-    </nav>
+    <div class="container mt-5">
+      <h1>Expense Tracker</h1>
+      Number of Rows : <input type="number" value="3" id="numberRows"/>
+      <div class="list-group" id="expenses-list"></div>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-3" id="pagination-controls"></ul>
+      </nav>
+    </div>
+    
     
     
     <h2>LeadBoard </h2>

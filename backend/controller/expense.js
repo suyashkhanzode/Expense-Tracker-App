@@ -41,15 +41,48 @@ exports.addExpense = async (req, res, next) => {
   }
 };
 
-exports.getExpense = (req, res, next) => {
+exports.getExpenses = async (req, res, next) => {
   const userId = req.user.id;
+  const page = parseInt(req.params.page)
+  const limit = parseInt(req.params.limit);
+  const offset = (page - 1) * limit;
 
-  Expense.findAll({ where: { userId } })
-    .then((expenses) => res.status(200).json(expenses))
-    .catch((err) =>
-      res.status(500).json({ message: "An error occurred", error: err })
-    );
+  try {
+    const expenses = await Expense.findAndCountAll({
+      where: { userId: userId },
+      limit: limit,
+      offset: offset,
+    });
+ 
+
+    res.status(200).json({
+      totalItems: expenses.count,
+      totalPages: Math.ceil(expenses.count / limit),
+      currentPage: page,
+      expenses: expenses.rows
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'An error occurred', error: err });
+  }
 };
+
+exports.getExpensesReport = async (req, res, next) => {
+  const userId = req.user.id;
+  
+
+  try {
+    const expenses = await Expense.findAll({
+      where: { userId: userId }
+    
+    });
+ 
+    
+    res.status(200).json(expenses);
+  } catch (err) {
+    res.status(500).json({ message: 'An error occurred', error: err });
+  }
+};
+
 
 exports.deleteExpense = async (req, res, next) => {
   const { id } = req.params;

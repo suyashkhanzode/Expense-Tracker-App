@@ -1,6 +1,5 @@
 const token = window.sessionStorage.getItem("token");
-let currentPage = 1;
-const perPage = 5;
+
 function handleFormSubmit(event) {
   event.preventDefault();
   debugger;
@@ -33,27 +32,131 @@ function handleFormSubmit(event) {
     });
 }
 
+document.getElementById("numberRows").addEventListener("input", (event) => {
+  const number = parseInt(event.target.value);
+  window.sessionStorage.setItem("limit", number);
+  window.onload = pagination();
+});
 
-function handleOnLoad() {
-  axios
-    .get(`http://localhost:3000/expenses/get-expense`, {
-      headers: {
-        Authorization: token,
-      },
-    })
-    .then((res) => {
-      const expenses = res.data;
+function pagination() {
+  const limit = window.sessionStorage.getItem("limit");
+  let currentPage = 1;
 
-      
-      const totalPages = Math.ceil(expenses.length / perPage);
-      renderPagination(totalPages);
+  function fetchExpenses(page) {
+    axios
+      .get(`http://localhost:3000/expenses/get-expense/${page}/${limit}`, {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((response) => {
+        const { expenses, totalPages, currentPage } = response.data;
+        renderExpenses(expenses);
+        renderPagination(totalPages, currentPage);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
-      
-      renderExpenses(currentPage, expenses);
-    })
-    .catch((err) => {
-      console.log(err);
+  function renderExpenses(expenses) {
+    const expensesList = document.getElementById("expenses-list");
+    expensesList.innerHTML = "";
+    expenses.forEach((expense) => {
+      const list = document.createElement("li");
+      list.className = "list-group-item";
+      list.textContent =
+        expense.amount +
+        "  " +
+        expense.description +
+        " " +
+        expense.category +
+        " ";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "btn btn-danger";
+      deleteBtn.innerHTML = `<span>Delete</span>`;
+      deleteBtn.addEventListener("click", function () {
+        deleteExpense(expense.id);
+      });
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn btn-warning";
+      editBtn.innerHTML = `<span>Edit</span>`;
+      editBtn.addEventListener("click", function () {
+        editExpense(expense);
+      });
+
+      list.appendChild(deleteBtn);
+      list.appendChild(editBtn);
+      expensesList.appendChild(list);
+      isPremiumMember();
     });
+  }
+
+  function renderPagination(totalPages, currentPage) {
+    const paginationControls = document.getElementById("pagination-controls");
+    paginationControls.innerHTML = "";
+
+    // Previous Button
+    const prevItem = document.createElement("li");
+    prevItem.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+    const prevLink = document.createElement("a");
+    prevLink.className = "page-link";
+    prevLink.href = "#";
+    prevLink.textContent = "Previous";
+    prevLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (currentPage > 1) {
+        currentPage--;
+        fetchExpenses(currentPage);
+      }
+    });
+    prevItem.appendChild(prevLink);
+    paginationControls.appendChild(prevItem);
+
+    // Page Numbers
+    for (let i = 1; i <= totalPages; i++) {
+      const pageItem = document.createElement("li");
+      pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+      const pageLink = document.createElement("a");
+      pageLink.className = "page-link";
+      pageLink.href = "#";
+      pageLink.textContent = i;
+
+      pageLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (i !== currentPage) {
+          currentPage = i;
+          fetchExpenses(currentPage);
+        }
+      });
+
+      pageItem.appendChild(pageLink);
+      paginationControls.appendChild(pageItem);
+    }
+
+    // Next Button
+    const nextItem = document.createElement("li");
+    nextItem.className = `page-item ${
+      currentPage === totalPages ? "disabled" : ""
+    }`;
+    const nextLink = document.createElement("a");
+    nextLink.className = "page-link";
+    nextLink.href = "#";
+    nextLink.textContent = "Next";
+    nextLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (currentPage < totalPages) {
+        currentPage++;
+        fetchExpenses(currentPage);
+      }
+    });
+    nextItem.appendChild(nextLink);
+    paginationControls.appendChild(nextItem);
+  }
+
+  fetchExpenses(currentPage);
 }
 
 function deleteExpense(id) {
@@ -65,7 +168,7 @@ function deleteExpense(id) {
       },
     })
     .then(() => {
-      handleOnLoad();
+      pagination();
     })
     .catch((err) => {
       console.log(err);
@@ -111,95 +214,12 @@ function updateExpense(event, id) {
         handleFormSubmit(event);
       };
 
-      handleOnLoad();
+      pagination();
     })
     .catch((err) => {
       console.log(err);
     });
 }
-
-
-
-function renderExpenses(page, expenses) {
-  const startIndex = (page - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  const currentExpenses = expenses.slice(startIndex, endIndex);
-
-  const siteList = document.getElementById("expenseList");
-  siteList.innerHTML = "";
-  currentExpenses.forEach((item) => {
-    createList(item);
-  });
-}
-
-function renderPagination(totalPages) {
-  const pagination = document.querySelector(".pagination");
-  pagination.innerHTML = "";
-
-  const previousLi = createPaginationItem(
-    "Previous",
-    currentPage > 1 ? currentPage - 1 : 1
-  );
-  pagination.appendChild(previousLi);
-
-  for (let i = 1; i <= totalPages; i++) {
-    const li = createPaginationItem(i, i);
-    pagination.appendChild(li);
-  }
-
-  const nextLi = createPaginationItem(
-    "Next",
-    currentPage < totalPages ? currentPage + 1 : totalPages
-  );
-  pagination.appendChild(nextLi);
-}
-
-function createPaginationItem(label, page) {
-  const li = document.createElement("li");
-  li.className = "page-item";
-  const a = document.createElement("a");
-  a.className = "page-link";
-  a.href = "#";
-  a.textContent = label;
-  a.addEventListener("click", () => {
-    currentPage = page;
-    handleOnLoad();
-  });
-  li.appendChild(a);
-  return li;
-}
-
-
-
-
-
-function createList(expens) {
-  const list = document.createElement("li");
-  list.className = "list-group-item";
-  list.textContent =
-    expens.amount + "  " + expens.description + " " + expens.category + " ";
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.className = "btn btn-danger";
-  deleteBtn.innerHTML = `<span>Delete</span>`;
-  deleteBtn.addEventListener("click", function () {
-    deleteExpense(expens.id);
-  });
-
-  const editBtn = document.createElement("button");
-  editBtn.className = "btn btn-warning";
-  editBtn.innerHTML = `<span>Edit</span>`;
-  editBtn.addEventListener("click", function () {
-    editExpense(expens);
-  });
-
-  list.append(deleteBtn);
-  list.append(editBtn);
-
-  document.getElementById("expenseList").appendChild(list);
-  isPremiumMember();
-}
-
 
 document.getElementById("payBtn").addEventListener("click", () => {
   debugger;
@@ -324,15 +344,12 @@ function showLeadboard(data) {
 }
 
 function dowloadFile() {
-  axios.get(`http://localhost:3000/expenses/dowload`, {
-    headers: { Authorization: token },
-  })
-  .then((response) =>[
-     window.location.href = response.data.fileURL
-  ])
-  .catch((err) =>[
-      
-  ])
+  axios
+    .get(`http://localhost:3000/expenses/dowload`, {
+      headers: { Authorization: token },
+    })
+    .then((response) => [(window.location.href = response.data.fileURL)])
+    .catch((err) => []);
 }
 
-window.onload = handleOnLoad();
+window.onload = pagination();

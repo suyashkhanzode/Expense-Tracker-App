@@ -5,7 +5,9 @@ const router = express.Router();
 const expenseController = require('../controller/expense');
 const auth = require('../middleware/auth')
 
-router.get('/get-expense',auth.authenticate,expenseController.getExpense);
+router.get('/get-expense/:page/:limit',auth.authenticate,expenseController.getExpenses);
+
+router.get('/get-expense',auth.authenticate,expenseController.getExpensesReport);
 
 router.post('/add-expense',auth.authenticate,expenseController.addExpense);
 
