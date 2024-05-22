@@ -1,6 +1,15 @@
 const express = require("express");
 
+const helmet = require('helmet');
+
+const morgan = require('morgan');
+
+const path = require('path');
+const fs = require('fs');
+
 const app = express();
+
+app.use(helmet())
 
 app.use(express.json());
 
@@ -12,6 +21,9 @@ app.use((request, response, next)=>{
 
    next();
 });
+
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+app.use(morgan('combined', { stream: accessLogStream }))
 
 const userRoute = require('./routes/user')
 const expenseRoute = require('./routes/expense')

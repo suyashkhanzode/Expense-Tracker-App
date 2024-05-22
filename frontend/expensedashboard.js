@@ -25,7 +25,7 @@ function handleFormSubmit(event) {
       }
     )
     .then((res) => {
-      handleOnLoad();
+       pagination();
     })
     .catch((err) => {
       console.log(err);
@@ -39,7 +39,8 @@ document.getElementById("numberRows").addEventListener("input", (event) => {
 });
 
 function pagination() {
-  const limit = window.sessionStorage.getItem("limit");
+  const limit = window.sessionStorage.getItem("limit") || 3;
+ 
   let currentPage = 1;
 
   function fetchExpenses(page) {
