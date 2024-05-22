@@ -1,8 +1,9 @@
 const Expense = require("../models/expense");
 const User = require("../models/user");
 const sequelize = require("../utils/database");
-const AWS = require('aws-sdk')
-require('dotenv').config()
+const AWS = require("aws-sdk");
+require("dotenv").config();
+const FileURL = require('../models/fileurl');
 
 exports.addExpense = async (req, res, next) => {
   const { amount, description, category } = req.body;
@@ -31,7 +32,9 @@ exports.addExpense = async (req, res, next) => {
     );
 
     await t.commit();
-    res.status(201).json({ message: "Expense added successfully", expense: newExpense });
+    res
+      .status(201)
+      .json({ message: "Expense added successfully", expense: newExpense });
   } catch (err) {
     await t.rollback();
     res.status(500).json({ message: "An error occurred", error: err });
@@ -43,7 +46,9 @@ exports.getExpense = (req, res, next) => {
 
   Expense.findAll({ where: { userId } })
     .then((expenses) => res.status(200).json(expenses))
-    .catch((err) => res.status(500).json({ message: "An error occurred", error: err }));
+    .catch((err) =>
+      res.status(500).json({ message: "An error occurred", error: err })
+    );
 };
 
 exports.deleteExpense = async (req, res, next) => {
@@ -103,76 +108,72 @@ exports.updateExpense = async (req, res, next) => {
     );
 
     const currentTotalAmount = parseInt(user.totalAmount) || 0;
-    const updatedTotalAmount = currentTotalAmount - parseInt(oldExpense.amount) + parseInt(amount);
+    const updatedTotalAmount =
+      currentTotalAmount - parseInt(oldExpense.amount) + parseInt(amount);
 
-    await user.update({ totalAmount: updatedTotalAmount }, { where: { id: userId }, transaction: t });
+    await user.update(
+      { totalAmount: updatedTotalAmount },
+      { where: { id: userId }, transaction: t }
+    );
 
     await t.commit();
-    res.status(200).json({ message: "Expense updated successfully", expense: updatedExpense });
+    res
+      .status(200)
+      .json({
+        message: "Expense updated successfully",
+        expense: updatedExpense,
+      });
   } catch (err) {
     await t.rollback();
     res.status(500).json({ message: "An error occurred", error: err });
   }
 };
 
-// function uploadFile(fileName,data) {
-//     const s3 = new AWS.S3({
-//       accessKeyId: process.env.AWS_ACCESS_KEY,
-//       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//       region: process.env.AWS_REGION
-//     })
 
-//     s3.createBucket(()=>{
-//        var params = {
-//          Bucket : process.env.AWS_BUCKET_NAME,
-//          Key : fileName,
-//          Body : data
-//        };
-//        s3.upload(params,(err,s3Response) =>{
-//              if(err){
-//                 console.log(err);
-//              }else{
-//               console.log(s3Response)
-//              }
-//             })
-
-//     })
-// }
-function uploadFile(fileName, data) {
+async function uploadFile(data, fileName) {
   const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
   });
 
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: fileName,
-    Body: data,
-  };
-
   return new Promise((resolve, reject) => {
-    s3.upload(params, (err, s3Response) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        resolve(s3Response.Location);
-      }
+    s3.createBucket(() => {
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: fileName,
+        Body: data,
+        ACL: 'public-read'
+      };
+
+      s3.upload(params, (err, s3Response) => {
+        if (err) {
+          reject(err);
+        } else {
+          
+          resolve(s3Response.Location);
+        }
+      });
     });
   });
 }
 
-
-exports.downloadFile = async (req,res,next) =>{
-  //const userId = req.user.id;
+exports.downloadFile = async (req, res, next) => {
+  const t = await sequelize.transaction();
+  try {
+    const userId = req.user.id;
 
     const allExpense = await req.user.getExpenses();
     const data = JSON.stringify(allExpense);
-    const fileName = 'expense.txt';
-    const fileURL = await uploadFile(data,fileName);
-    console.log(fileURL);
+    const fileName = `expense${userId}/${new Date()}.txt`;
+    const fileURL = await uploadFile(data, fileName);
+    const fileurl = await FileURL.create({ url : fileURL,userId :userId},{transaction : t});
+     
+    await t.commit();
+    res.json({fileURL : fileURL});
+    
+  } catch (error) {
+    await t.rollback();
+    res.json({err : error});
+  }
 
-}
-
-
+};
