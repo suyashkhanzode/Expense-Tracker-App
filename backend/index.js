@@ -6,6 +6,7 @@ const morgan = require('morgan');
 
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config()
 
 const app = express();
 
@@ -56,11 +57,12 @@ forgotpasswordrequest.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'}
 user.hasMany(FileURL,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 FileURL.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 
+const PORT = process.env.PORT || 3000
 
 db.sync()
   .then((res) => {
-    app.listen(3000, () => {
-      console.log("Server Started");
+    app.listen(PORT, () => {
+      console.log("Server Started at " + PORT);
     });
   })
   .catch((err) => {
