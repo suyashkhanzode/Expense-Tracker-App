@@ -9,18 +9,15 @@ const fs = require('fs');
 require('dotenv').config()
 
 
-
-
-
-
-
-
-
 const app = express();
 
 app.use(helmet())
 
 app.use(express.json());
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+});
 
 app.use((request, response, next)=>{
    response.setHeader('Access-Control-Allow-Origin',"*");
