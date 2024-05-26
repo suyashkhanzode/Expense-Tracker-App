@@ -2,7 +2,7 @@ const token = window.sessionStorage.getItem("token");
 function handleOnLoad() {
     console.log(token)
     axios
-      .get(`http://localhost:3000/expenses/get-expense`, {
+      .get(`http://13.201.0.34:3000/expenses/get-expense`, {
         headers: {
           Authorization: token,
         },

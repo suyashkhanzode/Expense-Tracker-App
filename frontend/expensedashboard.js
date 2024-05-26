@@ -12,7 +12,7 @@ function handleFormSubmit(event) {
 
   axios
     .post(
-      `http://localhost:3000/expenses/add-expense`,
+      `http://13.201.0.34:3000/expenses/add-expense`,
       {
         description: description,
         amount: amount,
@@ -45,7 +45,7 @@ function pagination() {
 
   function fetchExpenses(page) {
     axios
-      .get(`http://localhost:3000/expenses/get-expense/${page}/${limit}`, {
+      .get(`http://13.201.0.34:3000/expenses/get-expense/${page}/${limit}`, {
         headers: {
           Authorization: token,
         },
@@ -163,7 +163,7 @@ function pagination() {
 function deleteExpense(id) {
   debugger;
   axios
-    .delete(`http://localhost:3000/expenses/delete-expense/${id}`, {
+    .delete(`http://13.201.0.34:3000/expenses/delete-expense/${id}`, {
       headers: {
         Authorization: token,
       },
@@ -197,7 +197,7 @@ function updateExpense(event, id) {
   debugger;
   axios
     .put(
-      `http://localhost:3000/expenses/update-expense/${id}`,
+      `http://13.201.0.34:3000/expenses/update-expense/${id}`,
       {
         description: updatedescription,
         amount: updateamount,
@@ -225,7 +225,7 @@ function updateExpense(event, id) {
 document.getElementById("payBtn").addEventListener("click", () => {
   debugger;
   axios
-    .get(`http://localhost:3000/order/buy-primium`, {
+    .get(`http://13.201.0.34:3000/order/buy-primium`, {
       headers: { Authorization: token },
     })
     .then((response) => {
@@ -247,7 +247,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
           // Verify the payment on the backend
           axios
             .post(
-              "http://localhost:3000/order/verify-payment",
+              "http://13.201.0.34:3000/order/verify-payment",
               {
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id,
@@ -314,7 +314,7 @@ function isPremiumMember() {
 
 function getLedboard() {
   axios
-    .get(`http://localhost:3000/user/get-total-amount`)
+    .get(`http://13.201.0.34:3000/user/get-total-amount`)
     .then((response) => {
       debugger;
       document.querySelectorAll(".list-group")[1].innerHTML = "";
@@ -346,7 +346,7 @@ function showLeadboard(data) {
 
 function dowloadFile() {
   axios
-    .get(`http://localhost:3000/expenses/dowload`, {
+    .get(`http://13.201.0.34:3000/expenses/dowload`, {
       headers: { Authorization: token },
     })
     .then((response) => [(window.location.href = response.data.fileURL)])
