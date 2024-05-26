@@ -7,7 +7,7 @@ document
     const newPassword = document.getElementById("newPassword").value;
     debugger;
     axios
-      .put(`http://13.201.0.34:3000/password/update-password/${requestUUID}`, {
+      .put(`http://localhost:3000/password/update-password/${requestUUID}`, {
         newPassword: newPassword,
       })
       .then((response) => {

@@ -5,7 +5,7 @@ function handleLogin(event) {
     event.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    axios.post("http://13.201.0.34:3000/user/login",{
+    axios.post("http://localhost:3000/user/login",{
         email : email,
         password : password
     })
