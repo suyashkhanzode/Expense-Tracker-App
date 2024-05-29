@@ -55,7 +55,7 @@ exports.resetPassword = async (req, res, next) => {
         res
           .status(200)
           .send(
-            `<a href="http://127.0.0.1:5500/updatepassword.html?requestUUID=${requestUUID}">Click Here To Update Password</a>`
+            `<a href="http://13.201.0.34/updatepassword.html?requestUUID=${requestUUID}">Click Here To Update Password</a>`
           );
       })
       .catch((err) => {

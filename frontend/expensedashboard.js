@@ -66,13 +66,10 @@ function pagination() {
     expenses.forEach((expense) => {
       const list = document.createElement("li");
       list.className = "list-group-item";
-      list.textContent =
-        expense.amount +
-        "  " +
-        expense.description +
-        " " +
-        expense.category +
-        " ";
+      list.textContent = ` Amount ->
+        ${expense.amount} | Discription ->
+        ${expense.description} | Category ->
+        ${expense.category} | `;
 
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "btn btn-danger";
@@ -99,7 +96,7 @@ function pagination() {
     const paginationControls = document.getElementById("pagination-controls");
     paginationControls.innerHTML = "";
 
-    // Previous Button
+   
     const prevItem = document.createElement("li");
     prevItem.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
     const prevLink = document.createElement("a");
@@ -116,7 +113,7 @@ function pagination() {
     prevItem.appendChild(prevLink);
     paginationControls.appendChild(prevItem);
 
-    // Page Numbers
+  
     for (let i = 1; i <= totalPages; i++) {
       const pageItem = document.createElement("li");
       pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
@@ -137,7 +134,7 @@ function pagination() {
       paginationControls.appendChild(pageItem);
     }
 
-    // Next Button
+   
     const nextItem = document.createElement("li");
     nextItem.className = `page-item ${
       currentPage === totalPages ? "disabled" : ""
@@ -231,20 +228,20 @@ document.getElementById("payBtn").addEventListener("click", () => {
     .then((response) => {
       const data = response.data;
       const options = {
-        key: data.key_id, // Razorpay key ID
-        amount: data.order.amount, // Amount in paisa
+        key: data.key_id,
+        amount: data.order.amount,
         currency: "INR",
         name: "Your Company Name",
         description: "Premium Subscription",
-        order_id: data.order.id, // Order ID from Razorpay
+        order_id: data.order.id, 
         handler: function (response) {
           alert(
             `Payment successful! Payment ID: ${response.razorpay_payment_id}`
           );
-          alert(`Order ID: ${response.razorpay_order_id}`);
-          alert(`Signature: ${response.razorpay_signature}`);
+          
+          alert(`Please Login Again `);
 
-          // Verify the payment on the backend
+         
           axios
             .post(
               "http://13.201.0.34:3000/order/verify-payment",
@@ -286,29 +283,45 @@ function isPremiumMember() {
   if (isPremiumUSer === "true") {
     const ele = document.getElementById("payBtnDiv");
     ele.innerHTML = "";
-    ele.innerHTML = "<h3>You Are Primium User</h3>";
-    const btn = document.createElement("button");
-    btn.className = "btn btn-info";
-    btn.textContent = "Show LeadBoard";
-    btn.addEventListener("click", () => {
-      getLedboard();
-    });
-    const reportBtn = document.createElement("button");
-    reportBtn.className = "btn btn-dark";
-    reportBtn.textContent = "Generate Report";
-    reportBtn.addEventListener("click", () => {
+    
+    
+    const container = document.createElement("div");
+    container.className = "container text-center my-3";
+    
+    
+    const message = document.createElement("h3");
+    message.textContent = "You Are a Premium User";
+    container.appendChild(message);
+    
+    
+    const row = document.createElement("div");
+    row.className = "row justify-content-center my-3";
+    
+    
+    const createButton = (text, className, onClick) => {
+      const col = document.createElement("div");
+      col.className = "col-12 col-md-4 mb-2"; 
+      const btn = document.createElement("button");
+      btn.className = `btn ${className} w-100`; 
+      btn.textContent = text;
+      btn.addEventListener("click", onClick);
+      col.appendChild(btn);
+      return col;
+    };
+    
+  
+    row.appendChild(createButton("Show Leaderboard", "btn-info", () => getLedboard()));
+    row.appendChild(createButton("Generate Report", "btn-dark", () => {
       window.location.href = "reportgeneration.html";
-    });
-    const downloadBtn = document.createElement("button");
-    downloadBtn.className = "btn btn-success";
-    downloadBtn.textContent = "Download";
-    downloadBtn.addEventListener("click", () => {
-      dowloadFile();
-    });
-    ele.appendChild(btn);
-    // ele.appendChild(`<span/>`)
-    ele.appendChild(reportBtn);
-    ele.appendChild(downloadBtn);
+    }));
+    row.appendChild(createButton("Download", "btn-success", () => dowloadFile()));
+    
+    
+    container.appendChild(row);
+    
+  
+    ele.appendChild(container);
+    
   }
 }
 

@@ -41,6 +41,7 @@ exports.addExpense = async (req, res, next) => {
   }
 };
 
+
 exports.getExpenses = async (req, res, next) => {
   const userId = req.user.id;
   const page = parseInt(req.params.page)

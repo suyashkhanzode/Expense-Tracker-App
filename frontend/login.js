@@ -10,7 +10,7 @@ function handleLogin(event) {
         password : password
     })
     .then((res)=>{
-        debugger;
+      
        if(res.data.message === "User authenticated successfully.")
        {
        
@@ -23,6 +23,7 @@ function handleLogin(event) {
         
     })
     .catch((err)=>{
-        
+      
+        alert(`${err.message}`)
     })
 }

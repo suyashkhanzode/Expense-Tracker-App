@@ -42,7 +42,7 @@ exports.loginUser = async (req, res, next) => {
   const password = req.body.password;
 
   try {
-    // Find the user by email
+   
     const user = await User.findOne({
       where: {
         email: email,
