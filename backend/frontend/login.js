@@ -5,7 +5,7 @@ function handleLogin(event) {
     event.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    axios.post("http://13.201.0.34:3000/user/login",{
+    axios.post("http://localhost:3000/user/login",{
         email : email,
         password : password
     })
@@ -13,9 +13,9 @@ function handleLogin(event) {
       
        if(res.data.message === "User authenticated successfully.")
        {
-       
+        debugger;
          const token = res.data.token;
-         const isPremiumUSer = res.data.isPremiumUSer;
+         const isPremiumUSer = res.data.isPremiumUser;
          window.sessionStorage.setItem("token",token);
          window.sessionStorage.setItem("isPremiumUSer",isPremiumUSer)
          window.location.href = '/expenseDashboard.html'
@@ -23,7 +23,7 @@ function handleLogin(event) {
         
     })
     .catch((err)=>{
-      
-        alert(`${err.message}`)
+      debugger;
+        alert(`${err.response.data.message}`)
     })
 }

@@ -12,7 +12,7 @@ function handleFormSubmit(event) {
 
   axios
     .post(
-      `http://13.201.0.34:3000/expenses/add-expense`,
+      `http://localhost:3000/expenses/add-expense`,
       {
         description: description,
         amount: amount,
@@ -45,7 +45,7 @@ function pagination() {
 
   function fetchExpenses(page) {
     axios
-      .get(`http://13.201.0.34:3000/expenses/get-expense/${page}/${limit}`, {
+      .get(`http://localhost:3000/expenses/get-expense/${page}/${limit}`, {
         headers: {
           Authorization: token,
         },
@@ -75,7 +75,7 @@ function pagination() {
       deleteBtn.className = "btn btn-danger";
       deleteBtn.innerHTML = `<span>Delete</span>`;
       deleteBtn.addEventListener("click", function () {
-        deleteExpense(expense.id);
+        deleteExpense(expense._id);
       });
 
       const editBtn = document.createElement("button");
@@ -160,7 +160,7 @@ function pagination() {
 function deleteExpense(id) {
   debugger;
   axios
-    .delete(`http://13.201.0.34:3000/expenses/delete-expense/${id}`, {
+    .delete(`http://localhost:3000/expenses/delete-expense/${id}`, {
       headers: {
         Authorization: token,
       },
@@ -179,7 +179,7 @@ function editExpense(expens) {
   document.getElementById("category").value = expens.category;
   const form = document.querySelector("form");
   form.onsubmit = (event) => {
-    updateExpense(event, expens.id);
+    updateExpense(event, expens._id);
   };
 }
 
@@ -194,7 +194,7 @@ function updateExpense(event, id) {
   debugger;
   axios
     .put(
-      `http://13.201.0.34:3000/expenses/update-expense/${id}`,
+      `http://localhost:3000/expenses/update-expense/${id}`,
       {
         description: updatedescription,
         amount: updateamount,
@@ -220,20 +220,21 @@ function updateExpense(event, id) {
 }
 
 document.getElementById("payBtn").addEventListener("click", () => {
-  debugger;
+ 
   axios
-    .get(`http://13.201.0.34:3000/order/buy-primium`, {
+    .get(`http://localhost:3000/order/buy-primium`, {
       headers: { Authorization: token },
     })
     .then((response) => {
       const data = response.data;
+      debugger;
       const options = {
         key: data.key_id,
-        amount: data.order.amount,
+        amount: data.amount,
         currency: "INR",
         name: "Your Company Name",
         description: "Premium Subscription",
-        order_id: data.order.id, 
+        order_id: data.order.orderId, 
         handler: function (response) {
           alert(
             `Payment successful! Payment ID: ${response.razorpay_payment_id}`
@@ -244,7 +245,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
          
           axios
             .post(
-              "http://13.201.0.34:3000/order/verify-payment",
+              "http://localhost:3000/order/verify-payment",
               {
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id,
@@ -327,7 +328,7 @@ function isPremiumMember() {
 
 function getLedboard() {
   axios
-    .get(`http://13.201.0.34:3000/user/get-total-amount`)
+    .get(`http://localhost:3000/user/get-total-amount`)
     .then((response) => {
       debugger;
       document.querySelectorAll(".list-group")[1].innerHTML = "";
@@ -359,7 +360,7 @@ function showLeadboard(data) {
 
 function dowloadFile() {
   axios
-    .get(`http://13.201.0.34:3000/expenses/dowload`, {
+    .get(`http://localhost:3000/expenses/dowload`, {
       headers: { Authorization: token },
     })
     .then((response) => [(window.location.href = response.data.fileURL)])

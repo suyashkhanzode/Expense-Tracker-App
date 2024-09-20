@@ -57,6 +57,10 @@ forgotpasswordrequest.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'}
 user.hasMany(FileURL,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 FileURL.belongsTo(user,{onDelete : 'CASCADE',onUpdate : 'CASCADE'})
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, "./frontend", "index.html"));
+});
+
 const PORT = process.env.PORT || 3000
 
 db.sync()

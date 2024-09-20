@@ -42,7 +42,6 @@ exports.loginUser = async (req, res, next) => {
   const password = req.body.password;
 
   try {
-   
     const user = await User.findOne({
       where: {
         email: email,
@@ -50,6 +49,7 @@ exports.loginUser = async (req, res, next) => {
     });
 
     if (!user) {
+      debugger;
       return res.status(404).json({
         message: "User not found with provided email.",
       });
@@ -59,7 +59,7 @@ exports.loginUser = async (req, res, next) => {
         res.status(200).json({
           message: "User authenticated successfully.",
           token: generateAccessToken(user),
-          isPremiumUSer: user.isPremium,
+          isPremiumUser: user.isPremium,
         });
       } else {
         res.status(401).json({

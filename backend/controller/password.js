@@ -1,4 +1,4 @@
-const smtp = require("../utils/sendblue");
+const smtp = require("../utils/nodemailer");
 const ForgotPasswordRequest = require("../models/forgotPasswordRequest");
 const sequelize = require("../utils/database");
 const bycript = require("bcrypt");
@@ -14,7 +14,7 @@ exports.forgotPassword = async (req, res, next) => {
   const request = await ForgotPasswordRequest.create({ userId: userId });
   debugger;
   const requestUUID = request.id;
-  const resetURL = `http://13.201.0.34:3000/password/reset-password/${requestUUID}`;
+  const resetURL = `http://localhost:3000/password/reset-password/${requestUUID}`;
   const html = `Click <a href ="${resetURL}">here</a>`;
   smtp
     .sendEmail(recieverMail, "Reset Password", "Your Reset Password Link", html)
@@ -55,7 +55,7 @@ exports.resetPassword = async (req, res, next) => {
         res
           .status(200)
           .send(
-            `<a href="http://13.201.0.34/updatepassword.html?requestUUID=${requestUUID}">Click Here To Update Password</a>`
+            `<a href="http://127.0.0.1:5500/updatepassword.html?requestUUID=${requestUUID}">Click Here To Update Password</a>`
           );
       })
       .catch((err) => {
